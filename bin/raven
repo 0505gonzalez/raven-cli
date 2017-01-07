@@ -1,0 +1,11 @@
+#!/usr/bin/env node
+
+'use strict';
+
+process.title = 'raven';
+
+process.on('uncaughtException', function(err) {
+    console.error('Uncaught exception:', err.stack);
+});
+
+require('../lib/raven_cli').run(process.argv);

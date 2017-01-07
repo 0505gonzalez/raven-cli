@@ -1,0 +1,40 @@
+{
+  "name": "raven-cli",
+  "version": "1.0.0",
+  "description": "A tool to build homebrew GBA games",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bin": {
+    "raven": "bin/raven"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/0505gonzalez/raven-cli.git"
+  },
+  "keywords": [
+    "raven",
+    "gba",
+    "homebrew",
+    "build",
+    "gameboy",
+    "advance"
+  ],
+  "author": "Juan Gonzalez",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/0505gonzalez/raven-cli/issues"
+  },
+  "homepage": "https://github.com/0505gonzalez/raven-cli#readme",
+  "dependencies": {
+    "colors": "^1.1.2",
+    "commander": "^2.9.0",
+    "fs-extra": "^1.0.0",
+    "prompt": "^1.0.0"
+  },
+  "devDependencies": {
+    "grunt": "^1.0.1",
+    "grunt-contrib-jshint": "^1.1.0",
+    "jshint": "^2.9.4"
+  }
+}
