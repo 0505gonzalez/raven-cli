@@ -6,7 +6,7 @@
 
 RAVEN_PATH := <%= raven_path %>
 
-include $(RAVEN_PATH)/gba_tools/gba_rules
+include $(RAVEN_PATH)/tools/arm/gba_rules
 
 #---------------------------------------------------------------------------------
 # TARGET is the name of the output, if this ends with _mb a multiboot image is generated

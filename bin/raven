@@ -8,7 +8,7 @@ process.on('uncaughtException', function(err) {
     console.error('Uncaught exception:', err.stack);
 });
 
-var RavenCli = require('../lib/raven_cli');
+var RavenCli = require('../src/raven_cli');
 var ravenCli = new RavenCli();
 
 ravenCli.run(process.argv);
