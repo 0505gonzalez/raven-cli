@@ -13,6 +13,7 @@ function RavenCli() {}
 
 RavenCli.prototype.run = function (argv) {
     prompt.message = null;
+    prompt.colors = false;
     program.version(pkg.version);
 
     program
@@ -25,7 +26,11 @@ RavenCli.prototype.run = function (argv) {
         .description('compile project or library')
         .action(RavenCli._handleBuildCommand);
 
-    program.parse(argv);
+    if (process.argv.slice(2).length) {
+        program.parse(argv);
+    } else {
+        program.outputHelp();
+    }
 };
 
 RavenCli._handleStartCommand = function () {
@@ -41,7 +46,8 @@ RavenCli._handleStartCommand = function () {
         }
     }, function (err, results) {
         if (err) {
-            console.error('\nAborting raven project creation');
+            console.error(colors.red('\nAborting raven project creation'));
+            return;
         }
 
         var projectOptions = {
