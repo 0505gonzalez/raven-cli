@@ -7,21 +7,19 @@ var exec = require('child_process').exec;
 var path = require('path');
 var assert = require('assert-plus');
 
-function ProjectBuilder() {
-    var RAVEN_TEMPLATE_PATH = path.resolve(__dirname) + '/../templates';
+var RAVEN_TEMPLATE_PATH = path.resolve(__dirname) + '/../templates';
 
-    var makefileTemplateFile = RAVEN_TEMPLATE_PATH + '/makefile.template';
-    var makefileTemplateStr = fs.readFileSync(makefileTemplateFile).toString();
+function ProjectBuilder() {}
 
-    this._makefileTemplate = _.template(makefileTemplateStr);
-    this.RAVEN_PATH = path.resolve(__dirname) + '/../..';
-}
-
-ProjectBuilder.prototype.build = function (options, callback) {
+ProjectBuilder.build = function (options, callback) {
     assert.string(options.project_directory, 'options.project_directory must be a string');
     assert.func(callback);
 
     var ravenProjectJSONFile = options.project_directory + '/raven.json';
+
+    var makefileTemplateFile = RAVEN_TEMPLATE_PATH + '/makefile.template';
+    var makefileTemplateStr = fs.readFileSync(makefileTemplateFile).toString();
+    var makefileTemplate = _.template(makefileTemplateStr);
 
     if (!fs.existsSync(ravenProjectJSONFile)) {
         throw new Error('This directory does not contain a valid package.json file');
@@ -40,8 +38,8 @@ ProjectBuilder.prototype.build = function (options, callback) {
 
     fs.mkdirSync(buildDirectory, '0744');
 
-    fs.writeFileSync(makefile, this._makefileTemplate({
-        raven_path: this.RAVEN_PATH,
+    fs.writeFileSync(makefile, makefileTemplate({
+        raven_path: path.resolve(__dirname) + '/../..',
         target_name: ravenProjectJSON.name
     }));
 
