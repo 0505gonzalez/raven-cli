@@ -45,9 +45,12 @@ ProjectBuilder.build = function (options, callback) {
 
     fse.copy(srcDirectory, buildSrcDirectory);
 
-    exec('make -C ' + buildDirectory, function (err, stdout, stderr) {
-        // TODO: Handle errors
-        callback(err, stdout, stderr);
+    exec('make -C ' + buildDirectory, function (err, stdout) {
+        if (err) {
+            return callback(err);
+        }
+
+        callback(null, stdout);
     });
 };
 

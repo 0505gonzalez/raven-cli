@@ -50,13 +50,20 @@ RavenCli._handleStartCommand = function () {
         };
 
         ProjectCreator.createNewProject(projectOptions, function () {
-            console.log(colors.green('\nProject successfully created'));
+            console.log(colors.green('\nProject was created successfully'));
         });
     });
 };
 
 RavenCli._handleBuildCommand = function () {
-    ProjectBuilder.build({ project_directory: process.cwd() }, function () {
+    ProjectBuilder.build({ project_directory: process.cwd() }, function (err, buildInfo) {
+        if (err) {
+            console.error(err.stack);
+            console.error(colors.red('\nProject build was unsuccessful'));
+            return;
+        }
+
+        console.log('\n' + buildInfo);
         console.log(colors.green('\nProject was built successfully'));
     });
 };
