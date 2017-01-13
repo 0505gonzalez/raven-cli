@@ -42,7 +42,7 @@ RavenCli.prototype.run = function (argv) {
                     console.error('\nAborting raven project creation');
                 }
 
-                self.projectCreator.buildNewProject({
+                self.projectCreator.createNewProject({
                     project_directory: process.cwd() + '/' + results.name,
                     project_name: results.name
                 }, function () {

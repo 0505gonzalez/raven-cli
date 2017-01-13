@@ -5,15 +5,20 @@ LIBGBA	:=	$(RAVEN_PATH)/tools/arm/libgba
 #---------------------------------------------------------------------------------
 %.gba: %.elf
 	@$(OBJCOPY) -O binary $< $@
-	@echo built ... $(notdir $@)
+	@echo building $(notdir $@)...
 	@gbafix $@
 
 #---------------------------------------------------------------------------------
 %_mb.elf:
-	@echo linking multiboot
+	@echo linking multiboot...
 	@$(LD) -specs=gba_mb.specs $(LDFLAGS) $(OFILES) $(LIBPATHS) $(LIBS) -o $@
 
 #---------------------------------------------------------------------------------
 %.elf:
-	@echo linking cartridge
+	@echo linking cartridge...
 	@$(LD)  $(LDFLAGS) -specs=gba.specs $(OFILES) $(LIBPATHS) $(LIBS) -o $@
+
+#---------------------------------------------------------------------------------
+%.a: $(OFILES)
+	@echo archiving...
+	$(AR) cr $@ $(OFILES)

@@ -14,7 +14,7 @@ function ProjectCreator() {
     this._helloWorldTemplate = _.template(helloWorldTemplateStr);
 }
 
-ProjectCreator.prototype.buildNewProject = function (options, callback) {
+ProjectCreator.prototype.createNewProject = function (options, callback) {
     assert.string(options.project_directory, 'options.project_directory must be a string');
     assert.string(options.project_name, 'options.project_name must be a string');
     assert.func(callback);

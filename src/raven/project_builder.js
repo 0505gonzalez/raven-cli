@@ -10,7 +10,7 @@ var assert = require('assert-plus');
 function ProjectBuilder() {
     var RAVEN_TEMPLATE_PATH = path.resolve(__dirname) + '/../templates';
 
-    var makefileTemplateFile = RAVEN_TEMPLATE_PATH + '/Makefile.template';
+    var makefileTemplateFile = RAVEN_TEMPLATE_PATH + '/makefile.template';
     var makefileTemplateStr = fs.readFileSync(makefileTemplateFile).toString();
 
     this._makefileTemplate = _.template(makefileTemplateStr);
@@ -49,7 +49,7 @@ ProjectBuilder.prototype.build = function (options, callback) {
 
     exec('make -C ' + buildDirectory, function (err, stdout, stderr) {
         // TODO: Handle errors
-        callback();
+        callback(err, stdout, stderr);
     });
 };
 
