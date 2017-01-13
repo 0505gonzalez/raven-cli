@@ -27,6 +27,7 @@ ProjectBuilder.build = function (options, callback) {
 
     var ravenProjectJSON = require(ravenProjectJSONFile);
 
+    var ravenPath = path.resolve(__dirname) + '/../..';
     var srcDirectory = options.project_directory + '/src';
     var buildDirectory = options.project_directory + '/build';
     var buildSrcDirectory = buildDirectory + '/src';
@@ -39,7 +40,7 @@ ProjectBuilder.build = function (options, callback) {
     fs.mkdirSync(buildDirectory, '0744');
 
     fs.writeFileSync(makefile, makefileTemplate({
-        raven_path: path.resolve(__dirname) + '/../..',
+        raven_path: path.normalize(ravenPath),
         target_name: ravenProjectJSON.name
     }));
 

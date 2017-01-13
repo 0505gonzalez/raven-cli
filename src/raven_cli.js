@@ -14,6 +14,7 @@ function RavenCli() {}
 RavenCli.prototype.run = function (argv) {
     prompt.message = null;
     prompt.colors = false;
+
     program.version(pkg.version);
 
     program
