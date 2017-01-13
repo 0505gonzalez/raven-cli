@@ -1,4 +1,4 @@
-include $(RAVEN_PATH)/tools/arm/base_tools
+include $(RAVEN_PATH)/tools/ARM/base_tools
 
 #---------------------------------------------------------------------------------
 %.a:

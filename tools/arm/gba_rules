@@ -1,6 +1,6 @@
-include $(RAVEN_PATH)/tools/arm/base_rules
+include $(RAVEN_PATH)/tools/ARM/base_rules
 
-LIBGBA	:=	$(RAVEN_PATH)/tools/arm/libgba
+LIBGBA	:=	$(RAVEN_PATH)/tools/ARM/libgba
 
 #---------------------------------------------------------------------------------
 %.gba: %.elf
