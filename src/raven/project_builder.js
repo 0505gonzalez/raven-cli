@@ -1,9 +1,10 @@
 'use strict';
 
 var _ = require('underscore');
+var async = require('async');
 var fs = require('fs');
 var fse = require('fs-extra');
-var exec = require('child_process').exec;
+var ChildProcess = require('child_process');
 var path = require('path');
 var assert = require('assert-plus');
 
@@ -15,38 +16,131 @@ ProjectBuilder.build = function (options, callback) {
     assert.string(options.project_directory, 'options.project_directory must be a string');
     assert.func(callback);
 
-    var ravenProjectJSONFile = options.project_directory + '/raven.json';
+    async.auto({
+        raven_project_configuration: function (callback) {
+            ProjectBuilder._getProjectConfiguration(options.project_directory, callback);
+        },
+        build_folder: ['raven_project_configuration', function (results, callback) {
+            ProjectBuilder._generateOrUpdateBuildFolder(options.project_directory, results.raven_project_configuration, callback);
+        }],
+        make_output: ['build_folder', function (results, callback) {
+            ProjectBuilder._runMakefile(results.build_folder, callback);
+        }]
+    }, function (err, results) {
+        if (err) {
+            return callback(err);
+        }
+
+        callback(null, results.make_output);
+    });
+};
+
+ProjectBuilder.clean = function (options, callback) {
+    assert.string(options.project_directory, 'options.project_directory must be a string');
+    assert.func(callback);
+
+    var buildFolderPath = options.project_directory + '/build';
+
+    async.auto({
+        raven_project_configuration: function (callback) {
+            ProjectBuilder._getProjectConfiguration(options.project_directory, callback);
+        },
+        remove_build_folder: ['raven_project_configuration', function (results, callback) {
+            fse.remove(buildFolderPath, callback);
+        }]
+    }, function (err) {
+        return callback(err);
+    });
+};
+
+ProjectBuilder._getProjectConfiguration = function (projectDirectory, callback) {
+    var ravenProjectJSONFile = projectDirectory + '/raven.json';
+
+    fs.exists(ravenProjectJSONFile, function (fileExists) {
+        if (!fileExists) {
+            return callback(new Error('This directory does not contain a valid raven.json file'));
+        }
+
+        callback(null, require(ravenProjectJSONFile));
+    });
+};
+
+ProjectBuilder._generateOrUpdateBuildFolder = function (projectDirectory, projectConfig, callback) {
+    var sourceFolderPath = projectDirectory + '/src';
+    var buildFolderPath = projectDirectory + '/build';
+    var buildSourceFolderPath = buildFolderPath + '/src';
+
+    async.auto({
+        does_build_folder_exist: function (callback) {
+            fs.exists(buildFolderPath, function (exists) { callback(null, exists); });
+        },
+        delete_current_build_source: ['does_build_folder_exist', function (results, callback) {
+            if (!results.does_build_folder_exist) {
+                return callback();
+            }
+
+            fse.remove(buildSourceFolderPath, callback);
+        }],
+        delete_current_makefile: ['does_build_folder_exist', function (results, callback) {
+            if (!results.does_build_folder_exist) {
+                return callback();
+            }
+
+            fse.remove(buildFolderPath + '/Makefile', callback);
+        }],
+        build_folder: ['does_build_folder_exist', function (results, callback) {
+            if (results.does_build_folder_exist) {
+                return callback();
+            }
+
+            fs.mkdir(buildFolderPath, '0744', function (err, res) {
+                callback(err, res);
+            });
+        }],
+        copy_latest_source: ['delete_current_build_source', function (results, callback) {
+            fse.copy(sourceFolderPath, buildSourceFolderPath, callback);
+        }],
+        generate_makefile: ['delete_current_makefile', function (results, callback) {
+
+            ProjectBuilder._generateMakefile(buildFolderPath, projectConfig, callback);
+        }]
+    }, function (err) {
+        if (err) {
+            return callback(err);
+        }
+
+        callback(null, buildFolderPath);
+    });
+};
+
+ProjectBuilder._generateMakefile = function (buildFolderPath, projectConfig, callback) {
+    var ravenPath = path.resolve(__dirname) + '/../..';
 
     var makefileTemplateFile = RAVEN_TEMPLATE_PATH + '/makefile.template';
-    var makefileTemplateStr = fs.readFileSync(makefileTemplateFile).toString();
-    var makefileTemplate = _.template(makefileTemplateStr);
+    var makefile = buildFolderPath + '/Makefile';
 
-    if (!fs.existsSync(ravenProjectJSONFile)) {
-        throw new Error('This directory does not contain a valid package.json file');
-    }
+    async.auto({
+        makefile_template_buffer: function (callback) {
+            fs.readFile(makefileTemplateFile, callback);
+        },
+        makefile: ['makefile_template_buffer', function (results, callback) {
+            var makefileTemplate = _.template(results.makefile_template_buffer.toString());
+            var makefileContent = makefileTemplate({
+                raven_path: path.normalize(ravenPath),
+                target_name: projectConfig.name
+            });
 
-    var ravenProjectJSON = require(ravenProjectJSONFile);
+            fs.writeFile(makefile, makefileContent, callback);
+        }]
+    }, function (err) {
+        return callback(err);
+    });
+};
 
-    var ravenPath = path.resolve(__dirname) + '/../..';
-    var srcDirectory = options.project_directory + '/src';
-    var buildDirectory = options.project_directory + '/build';
-    var buildSrcDirectory = buildDirectory + '/src';
-    var makefile = buildDirectory + '/Makefile';
+ProjectBuilder._runMakefile = function (buildFolderPath, callback) {
+    var command = 'make -C ' + buildFolderPath;
 
-    if (fs.existsSync(buildDirectory)) {
-        fse.removeSync(buildDirectory);
-    }
-
-    fs.mkdirSync(buildDirectory, '0744');
-
-    fs.writeFileSync(makefile, makefileTemplate({
-        raven_path: path.normalize(ravenPath),
-        target_name: ravenProjectJSON.name
-    }));
-
-    fse.copy(srcDirectory, buildSrcDirectory);
-
-    exec('make -C ' + buildDirectory, function (err, stdout) {
+    ChildProcess.exec(command, function (err, stdout) {
         if (err) {
             return callback(err);
         }
