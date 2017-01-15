@@ -27,6 +27,11 @@ RavenCli.prototype.run = function (argv) {
         .description('compile project or library')
         .action(RavenCli._handleBuildCommand);
 
+    program
+        .command('clean')
+        .description('clean up build files')
+        .action(RavenCli._handleCleanCommand);
+
     if (process.argv.slice(2).length) {
         program.parse(argv);
     } else {
@@ -72,6 +77,18 @@ RavenCli._handleBuildCommand = function () {
 
         console.log('\n' + buildInfo);
         console.log(colors.green('\nProject was built successfully'));
+    });
+};
+
+RavenCli._handleCleanCommand = function () {
+    ProjectBuilder.clean({ project_directory: process.cwd() }, function (err) {
+        if (err) {
+            console.log(err.stack);
+            console.error(colors.red('\nProject clean was unsuccessful'));
+            return;
+        }
+
+        console.log(colors.green('\nProject was cleaned successfully'));
     });
 };
 
