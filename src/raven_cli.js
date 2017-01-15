@@ -45,8 +45,8 @@ RavenCli._handleStartCommand = function () {
     prompt.get({
         properties: {
             name: {
-                pattern: /^[a-zA-Z\s\-\_]+$/,
-                message: 'Name must be only letters, spaces, or dashes',
+                pattern: /^[a-zA-Z\_]+$/,
+                message: 'Name must be only letters and underscores',
                 required: true
             }
         }
