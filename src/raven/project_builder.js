@@ -7,6 +7,7 @@ var fse = require('fs-extra');
 var ChildProcess = require('child_process');
 var path = require('path');
 var assert = require('assert-plus');
+var ProjectConfigValidator = require('./utils/project_config_validator');
 
 var RAVEN_TEMPLATE_PATH = path.resolve(__dirname) + '/../templates';
 
@@ -61,7 +62,15 @@ ProjectBuilder._getProjectConfiguration = function (projectDirectory, callback) 
             return callback(new Error('This directory does not contain a valid raven.json file'));
         }
 
-        callback(null, require(ravenProjectJSONFile));
+        var ravenProjectConfig = require(ravenProjectJSONFile);
+
+        ProjectConfigValidator.validate(ravenProjectConfig, function (err) {
+            if (err) {
+                return callback(err);
+            }
+
+            callback(null, ravenProjectConfig);
+        });
     });
 };
 
