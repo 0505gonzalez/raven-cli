@@ -104,24 +104,108 @@ ProjectBuilder._updateBuildFolder = function (sourceFolderPath, buildFolderPath,
     var buildSourceFolderPath = buildFolderPath + '/src';
 
     async.auto({
-        delete_current_build_source: function (callback) {
-            fse.remove(buildSourceFolderPath, callback);
-        },
         delete_current_makefile: function (callback) {
             fse.remove(buildFolderPath + '/Makefile', callback);
         },
-        copy_latest_source: ['delete_current_build_source', function (results, callback) {
-            fse.copy(sourceFolderPath, buildSourceFolderPath, callback);
-        }],
         generate_makefile: ['delete_current_makefile', function (results, callback) {
             ProjectBuilder._generateMakefile(buildFolderPath, projectConfig, callback);
-        }]
+        }],
+        update_build_source: function (callback) {
+            ProjectBuilder._updateBuildSourceFolder(sourceFolderPath, buildSourceFolderPath, callback);
+        }
     }, function (err) {
         if (err) {
             return callback(err);
         }
 
         callback(null, buildFolderPath);
+    });
+};
+
+ProjectBuilder._updateBuildSourceFolder = function (sourceFolderPath, buildSourceFolderPath, callback) {
+    async.auto({
+        source_files: function (callback) {
+            ProjectBuilder._getListOfSourceFiles(sourceFolderPath, callback);
+        },
+        build_source_files: function (callback) {
+            ProjectBuilder._getListOfSourceFiles(buildSourceFolderPath, callback);
+        },
+        remove_deleted_files: ['source_files', 'build_source_files', function (results, callback) {
+            var deletedFiles = _.difference(results.build_source_files, results.source_files);
+            var deletedFilePaths = _.map(deletedFiles, function (deletedFile) {
+                return buildSourceFolderPath + '/' + deletedFile;
+            });
+
+            async.each(deletedFilePaths, fse.remove, callback);
+        }],
+        copy_new_files: ['source_files', 'build_source_files', function (results, callback) {
+            var newFiles = _.difference(results.source_files, results.build_source_files);
+
+            async.each(newFiles, function (newFile, next) {
+                var sourceFilePath = sourceFolderPath + '/' + newFile;
+                var buildSourceFilePath = buildSourceFolderPath + '/' + newFile;
+
+                fse.copy(sourceFilePath, buildSourceFilePath, next);
+            }, callback);
+        }],
+        update_modified_files: ['source_files', 'build_source_files', function (results, callback) {
+            var potentiallyUpdatedFiles = _.intersection(results.source_files, results.build_source_files);
+
+            async.each(potentiallyUpdatedFiles, function (potentiallyUpdatedFile, next) {
+                var sourceFilePath = sourceFolderPath + '/' + potentiallyUpdatedFile;
+                var buildSourceFilePath = buildSourceFolderPath + '/' + potentiallyUpdatedFile;
+
+                var sourceFileModifiedDate = new Date(fs.statSync(sourceFilePath).mtime);
+                var buildSourceModifiedDate = new Date(fs.statSync(buildSourceFilePath).mtime);
+
+                if (buildSourceModifiedDate.getTime() > sourceFileModifiedDate.getTime()) {
+                    return next();
+                }
+
+                fse.copy(sourceFilePath, buildSourceFilePath, next);
+            }, callback);
+        }]
+    }, function (err) {
+        callback(err);
+    });
+};
+
+ProjectBuilder._getListOfSourceFiles = function (directory, callback) {
+    async.auto({
+        files: function (callback) {
+            fs.readdir(directory, callback);
+        },
+        source_file_lists: ['files', function (results, callback) {
+            function toListOfSourceFiles (file, callback) {
+                var filePath = directory + '/' + file;
+
+                if (fs.lstatSync(filePath).isDirectory()) {
+                    ProjectBuilder._getListOfSourceFiles(filePath, function (err, subFiles) {
+                        if (err) {
+                            return callback(err);
+                        }
+
+                        var normalizedFiles = _.map(subFiles, function (subFile) { return file + '/' + subFile; });
+
+                        callback(null, normalizedFiles);
+                    });
+                } else {
+                    callback(null, [file]);
+                }
+            }
+
+            async.map(results.files, toListOfSourceFiles, callback);
+        }]
+    }, function (err, results) {
+        if (err) {
+            callback(err);
+        }
+
+        function concatArrays (firstArray, secondArray) {
+            return firstArray.concat(secondArray);
+        }
+
+        callback(null, _.reduce(results.source_file_lists, concatArrays, []));
     });
 };
 
