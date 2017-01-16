@@ -1,23 +1,38 @@
-# raven-cli
-Raven cli is a tool that simplifies the creation of homebrew GBA roms. Project is under construction.
+# Raven-Cli
+The Raven Framework command line utility makes it easy to get started building GBA ROMs.
 
-## Exploratory features:
-### C++ Implementation of the library
-Can we use c++ standard lib?
+Use the `raven --help` command for a description of all raven cli commands.
 
-### Javascript execution
-One way to simplify GBA game development would be to use one of the most used scripting languages: Javascript. We would need to implement a clear API and add hooks on the Javascript side.
+## Supported platforms
+The current build of raven cli has only been tested and confirmed working on MacOSX. Linux and Windows support is planned:
+Linux: https://github.com/ravenframework/raven-cli/issues/25
+Windows: https://github.com/ravenframework/raven-cli/issues/26
 
-Requirements:
-* The javascript engine would need to have a very small footprint
+## Installing
+```
+$ npm install -g raven-cli
+```
 
-Research required:
-* What is the maximum memory and storage footprint the JS engine can have?
-* Is it possible to implement the library in such a way that it mimicks the HTML5 canvas API? Can the JS engine handle something like this?
+## Starting a raven project
+```
+$ raven start
+```
+This command will generate your project folder with the necessary files to get started.
 
-## TODO:
-### Documentation
-Another huge barrier to GBA development is the lack of documentation. Creating comprehensive documentation and publishing a website with this content will have a huge impact on ease of development.
+## Building your project
+```
+$ raven build
+```
+Running the build command will generate the `build` folder. In this folder, you will find your build rom (`build/<project_name>_mb.gba`). You can ignore the other files in that folder, as they are just required and generated files used to build the final `.gba` ROM.
 
-### Contribution instructions
-Document the contribution process and update milestones
+## Cleaning your project
+```
+$ raven clean
+```
+Run this command to clean your project folder of non-essential files. This command will delete your build folder.
+
+## Source control
+We suggest that you ignore the `build` folder when submitting your changes to a source control service.
+
+## Contributing to Raven-Cli
+TODO: Document the contribution process
