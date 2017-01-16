@@ -4,8 +4,8 @@ var program = require('commander');
 var prompt = require('prompt');
 var colors = require('colors');
 
-var ProjectCreator = require('./raven/project_creator');
-var ProjectBuilder = require('./raven/project_builder');
+var ProjectCreator = require('./core/project_creator');
+var ProjectBuilder = require('./core/project_builder');
 
 var pkg = require('../package.json');
 

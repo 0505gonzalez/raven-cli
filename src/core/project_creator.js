@@ -62,8 +62,8 @@ ProjectCreator._generateProjectDirectory = function (projectDirectory, projectNa
 };
 
 ProjectCreator._generateMainSourcefile = function (projectDirectory, projectName, callback) {
-    var helloWorldTemplateFile = RAVEN_TEMPLATE_PATH + '/hello_world.cpp.template';
-    var newProjectMainfile = projectDirectory + '/src/' + projectName + '.cpp';
+    var helloWorldTemplateFile = RAVEN_TEMPLATE_PATH + '/hello_world.c.template';
+    var newProjectMainfile = projectDirectory + '/src/' + projectName + '.c';
 
     async.auto({
         hello_world_template_buffer: function (callback) {
