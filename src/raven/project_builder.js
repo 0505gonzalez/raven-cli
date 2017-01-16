@@ -68,40 +68,52 @@ ProjectBuilder._getProjectConfiguration = function (projectDirectory, callback) 
 ProjectBuilder._generateOrUpdateBuildFolder = function (projectDirectory, projectConfig, callback) {
     var sourceFolderPath = projectDirectory + '/src';
     var buildFolderPath = projectDirectory + '/build';
+
+    fs.exists(buildFolderPath, function (exists) {
+        if (exists) {
+            return ProjectBuilder._updateBuildFolder(sourceFolderPath, buildFolderPath, projectConfig, callback);
+        } else {
+            return ProjectBuilder._generateBuildFolder(sourceFolderPath, buildFolderPath, projectConfig, callback);
+        }
+    });
+};
+
+ProjectBuilder._generateBuildFolder = function (sourceFolderPath, buildFolderPath, projectConfig, callback) {
     var buildSourceFolderPath = buildFolderPath + '/src';
 
     async.auto({
-        does_build_folder_exist: function (callback) {
-            fs.exists(buildFolderPath, function (exists) { callback(null, exists); });
+        build_folder: function (callback) {
+            fs.mkdir(buildFolderPath, '0744', callback);
         },
-        delete_current_build_source: ['does_build_folder_exist', function (results, callback) {
-            if (!results.does_build_folder_exist) {
-                return callback();
-            }
+        copy_latest_source: ['build_folder', function (results, callback) {
+            fse.copy(sourceFolderPath, buildSourceFolderPath, callback);
+        }],
+        generate_makefile: ['build_folder', function (results, callback) {
+            ProjectBuilder._generateMakefile(buildFolderPath, projectConfig, callback);
+        }]
+    }, function (err) {
+        if (err) {
+            return callback(err);
+        }
 
+        callback(null, buildFolderPath);
+    });
+};
+
+ProjectBuilder._updateBuildFolder = function (sourceFolderPath, buildFolderPath, projectConfig, callback) {
+    var buildSourceFolderPath = buildFolderPath + '/src';
+
+    async.auto({
+        delete_current_build_source: function (callback) {
             fse.remove(buildSourceFolderPath, callback);
-        }],
-        delete_current_makefile: ['does_build_folder_exist', function (results, callback) {
-            if (!results.does_build_folder_exist) {
-                return callback();
-            }
-
+        },
+        delete_current_makefile: function (callback) {
             fse.remove(buildFolderPath + '/Makefile', callback);
-        }],
-        build_folder: ['does_build_folder_exist', function (results, callback) {
-            if (results.does_build_folder_exist) {
-                return callback();
-            }
-
-            fs.mkdir(buildFolderPath, '0744', function (err, res) {
-                callback(err, res);
-            });
-        }],
+        },
         copy_latest_source: ['delete_current_build_source', function (results, callback) {
             fse.copy(sourceFolderPath, buildSourceFolderPath, callback);
         }],
         generate_makefile: ['delete_current_makefile', function (results, callback) {
-
             ProjectBuilder._generateMakefile(buildFolderPath, projectConfig, callback);
         }]
     }, function (err) {
