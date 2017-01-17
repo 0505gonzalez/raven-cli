@@ -27,11 +27,16 @@ This command will generate your project folder with the necessary files to get s
 ```
 The `raven.json` file will contain your project's configuration, while the `sample.c` file will contain the primary entry-point to your game.
 
+## Developing your game
+Start by modifying the generated source file. The libgba library (https://github.com/devkitPro/libgba) is automatically linked to your project. Option to link other libraries is planned for the future.
+
 ## Building your project
 ```
 $ raven build
 ```
 Running the build command will generate the `build` folder. In this folder, you will find your build rom (`build/<project_name>_mb.gba`). You can ignore the other files in that folder, as they are just required and generated files used to build the final `.gba` ROM.
+
+Note that raven expects the `.c` file with the `main` entry-point to the game to be named the same as the project (the same as the `name` field in `raven.json`).
 
 ## Cleaning your project
 ```
