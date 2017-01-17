@@ -1,9 +1,13 @@
 'use strict';
 
+var path = require('path');
+
+global.PROJECT_PATH = path.resolve(__dirname);
+
 module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-mocha-test');
-    
+
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
         jshint: {
@@ -21,7 +25,7 @@ module.exports = function (grunt) {
                     clearRequireCache: false,
                     noFail: false
                 },
-                src: ['test/**/*.js']
+                src: ['test/**/*.test.js']
             }
         }
     });

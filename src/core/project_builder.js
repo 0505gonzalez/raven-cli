@@ -9,7 +9,7 @@ var path = require('path');
 var assert = require('assert-plus');
 var ProjectConfigValidator = require('./utils/project_config_validator');
 
-var RAVEN_TEMPLATE_PATH = path.resolve(__dirname) + '/../templates';
+var RAVEN_TEMPLATE_PATH = path.resolve(__dirname) + '/templates';
 
 function ProjectBuilder() {}
 
@@ -167,7 +167,7 @@ ProjectBuilder._updateBuildSourceFolder = function (sourceFolderPath, buildSourc
                 var sourceFileModifiedDate = new Date(fs.statSync(sourceFilePath).mtime);
                 var buildSourceModifiedDate = new Date(fs.statSync(buildSourceFilePath).mtime);
 
-                if (buildSourceModifiedDate.getTime() > sourceFileModifiedDate.getTime()) {
+                if (buildSourceModifiedDate.getTime() >= sourceFileModifiedDate.getTime()) {
                     return next();
                 }
 

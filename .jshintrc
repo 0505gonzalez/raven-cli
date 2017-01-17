@@ -166,6 +166,7 @@
         "expect": true,
         "by": true,
         "browser": true,
-        "element": true
+        "element": true,
+        "PROJECT_PATH": true
         }
 }

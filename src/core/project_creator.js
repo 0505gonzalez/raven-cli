@@ -6,7 +6,7 @@ var fs = require('fs');
 var path = require('path');
 var assert = require('assert-plus');
 
-var RAVEN_TEMPLATE_PATH = path.resolve(__dirname) + '/../templates';
+var RAVEN_TEMPLATE_PATH = path.resolve(__dirname) + '/templates';
 
 function ProjectCreator() {}
 
