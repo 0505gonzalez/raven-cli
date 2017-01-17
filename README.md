@@ -17,7 +17,13 @@ $ npm install -g raven-cli
 ```
 $ raven start
 ```
-This command will generate your project folder with the necessary files to get started.
+This command will generate your project folder with the necessary files to get started. The resulting project folder structure will look as follows:
+```
+|-- raven.json
+`-- src
+   `-- sample.c
+```
+The `raven.json` file will contain your project's configuration, while the `sample.c` file will contain the primary entry-point to your game.
 
 ## Building your project
 ```
