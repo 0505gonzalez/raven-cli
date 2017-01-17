@@ -1,6 +1,6 @@
 {
   "name": "raven-cli",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A tool to build homebrew GBA games",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
