@@ -5,7 +5,9 @@ Use the `raven --help` command for a description of all raven cli commands.
 
 ## Supported platforms
 The current build of raven cli has only been tested and confirmed working on MacOSX. Linux and Windows support is planned:
+
 Linux: https://github.com/ravenframework/raven-cli/issues/25
+
 Windows: https://github.com/ravenframework/raven-cli/issues/26
 
 ## Installing
@@ -42,3 +44,8 @@ We suggest that you ignore the `build` folder when submitting your changes to a 
 
 ## Contributing to Raven-Cli
 TODO: Document the contribution process
+
+## License
+TODO: Add license agreements (probably GPL)
+
+Libraries and tools in `/tools/ARM` come from the devkitPro project (http://devkitpro.org/).
