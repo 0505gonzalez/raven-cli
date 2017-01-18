@@ -1,8 +1,9 @@
 {
   "name": "raven-cli",
-  "version": "0.1.2",
+  "version": "0.1.5",
   "description": "A tool to build homebrew GBA games",
   "scripts": {
+    "preinstall": "./symlinks.sh",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "bin": {

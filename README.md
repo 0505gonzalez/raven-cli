@@ -1,7 +1,9 @@
-# Raven-Cli
+# Raven-Cli Beta
 The Raven Framework command line utility makes it easy to get started building GBA ROMs.
 
 Use the `raven --help` command for a description of all raven cli commands.
+
+Note that this project is still under construction.
 
 ## Supported platforms
 The current build of raven cli has only been tested and confirmed working on MacOSX. Linux and Windows support is planned:

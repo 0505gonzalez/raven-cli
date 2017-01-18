@@ -38,3 +38,8 @@ jspm_packages
 
 # Test output
 test_out
+
+# Symlinks
+tools/ARM/lib/libcc1.so
+tools/ARM/libexec/gcc/arm-none-eabi/5.3.0/liblto_plugin.so
+tools/ARM/lib/gcc/arm-none-eabi/5.3.0/plugin/libcc1plugin.so
